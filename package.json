@@ -1,0 +1,19 @@
+{
+  "name": "ytbe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "express": "^4.17.2",
+    "ytdl-core": "^4.10.0",
+    "ytdl-core-muxer": "^1.0.1",
+    "ytpl": "^2.2.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,474 @@
+<html>
+
+<head>
+    <title>Youtube Downloaders</title>
+    <style>
+        body {
+            /* https://flatuicolors.com/palette/se */
+            background-color: #1e272e;
+            color: white;
+            font-size: 1rem;
+            position: relative;
+        }
+
+        a {
+            color: #0000EE;
+            text-decoration: underline;
+        }
+
+        input[type=radio] {
+            border: 0px;
+            width: 20px;
+            height: 20px;
+        }
+
+        input[type=radio]:hover {
+            cursor: pointer;
+        }
+
+        #dashboard {
+            position: relative;
+            color: black;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video {
+            padding: 20px;
+            background-color: #d2dae2;
+            width: 50%;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .video>a {
+            float: left;
+            text-overflow: ellipsis;
+        }
+
+        .completed {
+            background-color: #3b5d50;
+        }
+
+        .options {
+            float: right;
+            width: 100px;
+        }
+
+        .downloading {
+            color: green;
+        }
+
+        #search_board {
+            padding-top: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #search_board>* {
+            display: inline;
+        }
+
+        #search_board>input {
+            width: 40%;
+            height: 30px;
+        }
+
+        #search_board>button {
+            padding: 10px
+        }
+
+        #controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #controls>button {
+            padding: 10px;
+        }
+
+        button:hover {
+            background-color: cadetblue;
+            cursor: pointer;
+        }
+
+        #blocker {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.472);
+            height: 100vh;
+            width: 100vw;
+            z-index: 1;
+            top: 0;
+            left: 0;
+
+            display: none;
+        }
+
+        #playlist {
+            height: 70vh;
+            width: 70vw;
+            background-color: seashell;
+
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%)
+
+        }
+
+        #playlist_panel {
+            overflow-x: hidden;
+            color: black;
+
+            width: 90%;
+            height: 55vh;
+        }
+
+        #playlist_panel>ul {
+            list-style-type: none;
+        }
+
+        #playlist_panel>ul>li {
+            padding: 10px;
+            font-size: large;
+            color: blue;
+        }
+        #playlist>button{
+            float: right;
+            background-color: lightblue;
+            border: 1px solid black;
+            padding: 10px;
+            padding-right: 20px;
+            padding-left: 20px;
+            font-size: large;
+            margin: 20px;
+        }
+
+        .display_num {
+            width: 50px;
+            height: 50px;
+            font-size: large;
+        }
+
+        #dis_slash {
+            font-size: 50px;
+            color: black;
+        }
+
+        .dis_control {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            float: none;
+        }
+        .playlist_selected{
+            background-color: rgba(95, 158, 160, 0.50);
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <div id='blocker'>
+        <div id='playlist'>
+
+            <div id='playlist_panel'>
+                <ul>
+                    <li class='playlist_selected'><a>1. asdwfsefsdf</a></li>
+                    <li><a>1. asdwfsefsdf</a></li>
+                    <li><a>1. asdwfsefsdf</a></li>
+                    <li><a>1. asdwfsefsdf</a></li>
+                    <li><a>1. asdwfsefsdf</a></li>
+
+                    <li><a>1. asdwfsefsdf</a></li>
+                    <li><a>1. asdwfsefsdf</a></li>
+                    <li><a>1. asdwfsefsdf</a></li>
+                    <li><a>1. asdwfsefsdf</a></li>
+                    <li><a>1. asdwfsefsdf</a></li>
+                </ul>
+            </div>
+
+            <div class='dis_control'>
+                <input class='display_num' type="text" id='start' oninput="renderPlaylist()"> <span id='dis_slash'>/</span>
+                <input class='display_num' type="text" id='finish' oninput="renderPlaylist()">
+            </div>
+
+            <button onclick='cancelPlaylist()' style="background-color: lightcoral;">CANCEL</button>
+            <button onclick="okPlaylist()">OK</button>
+        </div>
+    </div>
+
+    <div id='search_board'>
+        <h3>Youtube-URL:</h3>
+        <input id='input_url' type="text">
+        <div><input type="radio" name="default-url" value="mp4" checked>MP4</div>
+        <div><input type="radio" name="default-url" value="mp3">MP3</div>
+        <button onclick="download(event)">Download</button>
+    </div>
+
+    <div id='controls'>
+        Change all:
+        <button onclick="editAll(true)">MP4</button>
+        <button onclick="editAll(false)">MP3</button>
+        <button onclick="clearDownloads(event)">Clear</button>
+        <button onclick="clearDownloads(event,'yes')">Reset</button>
+    </div>
+
+    <div id='dashboard'>
+
+        <div class='video downloading'>
+            <a target="_blank"
+                href="https://www.youtube.com/watch?v=SlwmLFMa4ZE&list=PL38aOltrCV-fP_mpzA5Do-4oJ3Gpv4MHn&index=1&ab_channel=Paahdettu">
+                SPIDERMAN Spiderman--Author--ID
+            </a>
+            <div class='options'>Downloading</div>
+        </div>
+
+        <div class='video'>
+            <a target="_blank"
+                href="https://www.youtube.com/watch?v=SlwmLFMa4ZE&list=PL38aOltrCV-fP_mpzA5Do-4oJ3Gpv4MHn&index=1&ab_channel=Paahdettu">
+                SPIDERMAN Spiderman--Author--ID
+            </a>
+            <div class='options'><input type="radio" name="contact" value="mp3">MP3</div>
+            <div class='options'><input type="radio" name="contact" value="mp4">MP4</div>
+        </div>
+
+        <div class='video'>
+            <a target="_blank"
+                href="https://www.youtube.com/watch?v=SlwmLFMa4ZE&list=PL38aOltrCV-fP_mpzA5Do-4oJ3Gpv4MHn&index=1&ab_channel=Paahdettu">
+                SPIDERMAN Spiderman--Author--ID
+            </a>
+            <div class='options'><input type="radio" name="contact" value="mp3">MP3</div>
+            <div class='options'><input type="radio" name="contact" value="mp4">MP4</div>
+        </div>
+
+        <div class='video completed'>
+            <a target="_blank"
+                href="https://www.youtube.com/watch?v=SlwmLFMa4ZE&list=PL38aOltrCV-fP_mpzA5Do-4oJ3Gpv4MHn&index=1&ab_channel=Paahdettu">
+                SPIDERMAN Spiderman--Author--ID
+            </a>
+            <div class='options'>✅</div>
+        </div>
+
+    </div>
+</body>
+
+<script defer>
+
+    let downloads = []
+    let downloaded = []
+    let downloading = null
+    let playlist = []
+
+    let dashboard = document.body.querySelector('#dashboard')
+    let blocker = document.getElementById('blocker')
+    let start = document.getElementById('start')
+    let finish = document.getElementById('finish')
+    let playlist_panel = document.body.querySelector('#playlist_panel>ul')
+
+    const mp4 = 'mp4'
+    const mp3 = 'mp3'
+
+    function cancelPlaylist(){
+        blocker.style.display = 'none'
+        playlist = []
+    }
+
+    async function post(url, mp4 = true) {
+        try {
+            const rawResponse = await fetch('/add', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url, ext: mp4 ? 'mp4' : 'mp3' })
+            });
+
+            const res = await rawResponse.json();
+            playlist = res.playlist || []
+
+            if (res.playlist){
+                blocker.style.display = 'block'
+                start.value=1
+                finish.value=res.playlist.length
+            }
+        }
+        catch (e) { }
+    }
+
+    async function updateData() {
+        try {
+            let ans = await fetch('/ping')
+            ans = await ans.json();
+            downloads = ans.downloads
+            downloaded = ans.downloaded
+            downloading = ans.downloading_obj || null
+        }
+        catch (e) { }
+    }
+
+    async function clearAll(all) {
+        try {
+            let ans = await fetch(all ? '/cleardownloads?downloaded=ok' : '/cleardownloads')
+            ans = await ans.json();
+            downloads = ans.downloads
+            downloaded = ans.downloaded
+        }
+        catch (e) { }
+    }
+
+    async function edit(unique_counts, ext) {
+        try {
+            const rawResponse = await fetch('/edit', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ unique_counts, ext })
+            });
+        }
+        catch (e) { }
+    }
+
+    async function remove(unique_counts) {
+        try {
+            const rawResponse = await fetch('/delete', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ unique_counts })
+            });
+        }
+        catch (e) { }
+    }
+
+    async function acceptPlaylist(start, end) {
+        try {
+            const rawResponse = await fetch('/plind', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ start, end })
+            });
+            const res = await rawResponse.json();
+        }
+        catch (e) { }
+    }
+
+    async function download(event) {
+        let ele = document.body.querySelector('#input_url')
+        let radios = document.querySelector('input[name="default-url"]:checked')
+        ele.value && await post(ele.value, radios.value == 'mp4' ? true : false)
+        ele.value = ''
+        if (playlist.length>0) await renderPlaylist()
+        else await update()
+    }
+    async function clearDownloads(event, all) {
+        if (all == null) await clearAll()
+        else await clearAll(true)
+        await update()
+    }
+
+    async function editAll(mp4_trig) {
+        let list = downloads.reduce((acc, obj) => {
+            if (downloading == null || obj.id != downloading.id) {
+                acc.push(obj.unique_counts)
+            }
+            return acc
+        }, [])
+        try {
+            const rawResponse = await fetch('/editAll', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ list, ext: (mp4_trig) ? mp4 : mp3 })
+            });
+        } catch (e) { }
+        finally {
+            await update()
+        }
+    }
+
+    function renderPlaylist(){
+        if (playlist.length>0){
+            let start_val = start.value
+            let end_val = finish.value
+            let list = playlist.map((item,ind)=>{
+                if (start_val<=ind+1 && ind+1<=end_val)
+                    return `<li class='playlist_selected'><a target='_blank' href='${item}'>${ind+1}. ${item}</a></li>`
+                else
+                    return `<li><a target='_blank' href="${item}">${ind+1}. ${item}</a></li>`
+            }).join('')
+            playlist_panel.innerHTML = list
+        }
+    }
+
+    async function update() {
+        await updateData()
+        //parse html
+        let list = downloads.map(obj => {
+            if (downloading && obj.id == downloading.id) {
+                return `
+                <div class='video downloading'>
+                <a target="_blank"
+                    href="${obj.url}">
+                    ${obj.title} by ${obj.owner}
+                </a>
+                <div class='options'>Downloading</div>
+                </div>
+                `
+            }
+            else return `
+            <div class='video'>
+            <a target="_blank"
+                href="${obj.url}">
+                ${obj.title} by ${obj.owner}
+            </a>
+            <div class='options'><input type="radio" onclick="edit(${obj.unique_counts},${mp3})"
+                name="option_uqc_${obj.unique_counts}" ${obj.ext == 'mp3' && 'checked'} value="mp3">MP3</div>
+            <div class='options'><input type="radio" onclick="edit(${obj.unique_counts},${mp4})"
+                name="option_uqc_${obj.unique_counts}" ${obj.ext == 'mp4' && 'checked'} value="mp4">MP4</div>
+            </div>
+            `
+        }).join("")
+        let list2 = downloaded.map(obj => {
+            return `
+            <div class='video completed'>
+            <a target="_blank"
+                href="${obj.url}">
+                ${obj.title} by ${obj.owner}
+            </a>
+            <div class='options'>✅</div>
+            </div>
+            `
+        }).join("")
+
+        dashboard.innerHTML = list.concat(list2)
+    }
+
+    async function okPlaylist(){
+        let start_val = start.value
+        let end_val = finish.value
+        await acceptPlaylist(start_val,end_val)
+        cancelPlaylist()
+    }
+
+    setInterval(update, 2000)
+</script>
+
+</html>
